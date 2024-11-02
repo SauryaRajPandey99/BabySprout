@@ -38,7 +38,6 @@ function Navbared() {
                 </h3>
               </Nav.Link>
               <Nav.Link href="/maths">
-                {" "}
                 <h3>
                   <Badge bg="secondary">Explore Maths</Badge>
                 </h3>
