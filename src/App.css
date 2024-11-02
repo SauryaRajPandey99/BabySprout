@@ -1,0 +1,49 @@
+/* App.css */
+/*  @media print {
+    body {
+        background-image: url('/src/Assets/BabySprout.png');
+        /* Adjust the path to your image */
+/* background-size: cover;
+        -webkit-print-color-adjust: exact;
+    }
+
+    @page {
+        margin: 1in;
+    }
+
+    .problem:before {
+        content: "You got this";
+        display: block;
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+/* }
+
+/* App.css */
+@media print {
+    body {
+        background-image: url('/src/Assets/BabySprout.png');
+        /* Adjust the path to your image */
+        background-size: cover;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .print-container {
+        page-break-inside: avoid;
+        /* Ensure problems don't split between pages */
+    }
+
+    .problem:before {
+        content: "You got this ";
+        display: block;
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .problem {
+        page-break-inside: avoid;
+        /* Ensure problems don't split between pages */
+    }
+}
