@@ -10,95 +10,94 @@ import {
 } from "react-bootstrap";
 
 const MathOperation = ({ operationType }) => {
-  const [numCharacters, setNumCharacters] = useState("");
+  const [firstNumCharacters, setFirstNumCharacters] = useState("");
+  const [secondNumCharacters, setSecondNumCharacters] = useState("");
   const [numProblems, setNumProblems] = useState("");
   const [problems, setProblems] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
-  const [multiplierRange, setMultiplierRange] = useState({ min: 1, max: 10 });
-  const [multiplicantRange, setMultiplicantRange] = useState({
-    min: 1,
-    max: 10,
-  });
-
+  const [showAnswers, setShowAnswers] = useState(false);
   const printRef = useRef();
 
   const operationConfig = {
     addition: {
       title: "Addition Problems",
       symbol: "+",
+      calculate: (num1, num2) => num1 + num2,
     },
     multiplication: {
       title: "Multiplication Problems",
       symbol: "x",
+      calculate: (num1, num2) => num1 * num2,
     },
     subtraction: {
       title: "Subtraction Problems",
       symbol: "-",
+      calculate: (num1, num2) => num1 - num2,
     },
   };
 
-  const { title, symbol } = operationConfig[operationType];
+  const { title, symbol, calculate } = operationConfig[operationType];
 
-  // Previous functions remain the same...
   const generateProblems = () => {
-    const characterCount = parseInt(numCharacters) || 0;
+    const firstCharCount = parseInt(firstNumCharacters) || 0;
+    const secondCharCount = parseInt(secondNumCharacters) || 0;
     const problemCount = parseInt(numProblems) || 0;
 
-    if (characterCount <= 0 || problemCount <= 0) {
+    if (firstCharCount <= 0 || secondCharCount <= 0 || problemCount <= 0) {
       setShowAlert(true);
       return;
     }
 
     setShowAlert(false);
-    const maxNumber = Math.pow(10, characterCount) - 1;
+    const maxFirstNumber = Math.pow(10, firstCharCount) - 1;
+    const minFirstNumber = Math.pow(10, firstCharCount - 1);
+    const maxSecondNumber = Math.pow(10, secondCharCount) - 1;
+    const minSecondNumber = Math.pow(10, secondCharCount - 1);
+
     const generatedProblems = [];
     for (let i = 0; i < problemCount; i++) {
-      let num1 = Math.floor(Math.random() * maxNumber) + 1;
-      let num2 = Math.floor(Math.random() * maxNumber) + 1;
+      let num1 =
+        Math.floor(Math.random() * (maxFirstNumber - minFirstNumber + 1)) +
+        minFirstNumber;
+      let num2 =
+        Math.floor(Math.random() * (maxSecondNumber - minSecondNumber + 1)) +
+        minSecondNumber;
 
       if (operationType === "subtraction" && num1 < num2) {
         [num1, num2] = [num2, num1];
       }
 
-      generatedProblems.push({ num1, num2 });
+      const answer = calculate(num1, num2);
+      generatedProblems.push({ num1, num2, answer });
     }
 
-    //multiplicaiton addded
-    // for (let i = 0; i < problemCount; i++) {
-    //   let num1 = Math.floor(Math.random() * maxNumber) + 1;
-    //   let num2 = Math.floor(Math.random() * maxNumber) + 1;
-
-    //   if (operationType === "multiplication") {
-    //     num1 = Math.floor(
-    //       Math.random() * (multiplierRange.max - multiplierRange.min + 1) +
-    //         multiplierRange.min
-    //     );
-    //     num2 = Math.floor(
-    //       Math.random() * (multiplicantRange.max - multiplicantRange.min + 1) +
-    //         multiplicantRange.min
-    //     );
-    //   } else if (operationType === "subtraction" && num1 < num2) {
-    //     [num1, num2] = [num2, num1];
-    //   }
-
-    //   generatedProblems.push({ num1, num2 });
-    // }
     setProblems(generatedProblems);
   };
 
   const formatNumber = (num, width) => {
-    return String(num).padStart(width, "0");
+    return String(num).padStart(width, " ");
   };
 
-  const formatProblem = (index, num1, num2, width) => {
-    if (!width || width <= 0) {
-      return null;
-    }
+  const formatProblem = (
+    index,
+    num1,
+    num2,
+    includeAnswer = false,
+    answer = null
+  ) => {
+    const maxWidth = Math.max(
+      String(num1).length,
+      String(num2).length,
+      answer ? String(answer).length : 0
+    );
 
-    const paddedNum1 = formatNumber(num1, width);
-    const paddedNum2 = formatNumber(num2, width);
+    const paddedNum1 = formatNumber(num1, maxWidth);
+    const paddedNum2 = formatNumber(num2, maxWidth);
     const indexStr = `${index + 1}.`.padEnd(4);
-    const dashes = "-".repeat(width);
+    const dashes = "-".repeat(maxWidth);
+    const answerStr = includeAnswer
+      ? formatNumber(answer, maxWidth)
+      : " ".repeat(maxWidth);
 
     return (
       <pre
@@ -112,9 +111,29 @@ const MathOperation = ({ operationType }) => {
       >
         {`${indexStr}${paddedNum1}\n`}
         {`   ${symbol}${paddedNum2}\n`}
-        {`    ${dashes}`}
+        {`    ${dashes}\n`}
+        {`    ${answerStr}`}
       </pre>
     );
+  };
+
+  const downloadAnswers = () => {
+    let answersText = `${title} - Answers\n\n`;
+    problems.forEach((problem, index) => {
+      answersText += `${index + 1}. ${problem.num1} ${symbol} ${
+        problem.num2
+      } = ${problem.answer}\n`;
+    });
+
+    const blob = new Blob([answersText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title.toLowerCase().replace(/\s+/g, "-")}-answers.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handlePrint = () => {
@@ -206,12 +225,7 @@ const MathOperation = ({ operationType }) => {
   const PrintProblemsList = ({ startIndex, endIndex }) => {
     return problems.slice(startIndex, endIndex).map((problem, index) => (
       <div key={startIndex + index} className="print-card">
-        {formatProblem(
-          startIndex + index,
-          problem.num1,
-          problem.num2,
-          parseInt(numCharacters) || 0
-        )}
+        {formatProblem(startIndex + index, problem.num1, problem.num2, false)}
       </div>
     ));
   };
@@ -224,7 +238,8 @@ const MathOperation = ({ operationType }) => {
             startIndex + index,
             problem.num1,
             problem.num2,
-            parseInt(numCharacters) || 0
+            showAnswers,
+            problem.answer
           )}
         </Card.Body>
       </Card>
@@ -242,14 +257,12 @@ const MathOperation = ({ operationType }) => {
             src="/src/Assets/BabySprout.png"
             alt="Company Logo"
             className="print-logo"
-            width={"200px"}
           />
           <div className="text-center">
             <h2 className="print-title">{title}</h2>
             <div className="print-date">Date: {currentDate}</div>
           </div>
-          <div style={{ width: "200px" }}>Marks Secured :</div>{" "}
-          {/* Spacer for alignment */}
+          <div style={{ width: "200px" }}>Marks Secured :</div>
         </div>
         <div className="print-container">
           <div className="print-row">
@@ -272,11 +285,6 @@ const MathOperation = ({ operationType }) => {
 
   return (
     <Container>
-      {/* <Row className="my-4">
-        <Col>
-          <h1>{title}</h1>
-        </Col>
-      </Row> */}
       <Row className="my-4 justify-content-center">
         <Col md="auto">
           <h1
@@ -290,47 +298,15 @@ const MathOperation = ({ operationType }) => {
 
       {showAlert && (
         <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible>
-          Please enter values greater than 0 for both number of characters and
+          Please enter values greater than 0 for both number lengths and
           problems.
         </Alert>
       )}
 
-      {/* <Row className="my-4">
-        <Col>
-          <Form.Group controlId="numCharacters">
-            <Form.Label>Number of Characters</Form.Label>
-            <Form.Control
-              type="number"
-              value={numCharacters}
-              onChange={(e) => {
-                setNumCharacters(e.target.value);
-                setProblems([]);
-              }}
-              min="1"
-              max="10"
-            />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="numProblems">
-            <Form.Label>Number of Problems</Form.Label>
-            <Form.Control
-              type="number"
-              value={numProblems}
-              onChange={(e) => {
-                setNumProblems(e.target.value);
-                setProblems([]);
-              }}
-              min="1"
-              max="20"
-            />
-          </Form.Group>
-        </Col>
-      </Row> */}
       <Row className="my-4 justify-content-center">
-        <Col md={6}>
+        <Col md={4}>
           <Form.Group
-            controlId="numCharacters"
+            controlId="firstNumCharacters"
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.7)",
               padding: "20px",
@@ -344,13 +320,13 @@ const MathOperation = ({ operationType }) => {
                 textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
               }}
             >
-              Number of Characters
+              First Number Length
             </Form.Label>
             <Form.Control
               type="number"
-              value={numCharacters}
+              value={firstNumCharacters}
               onChange={(e) => {
-                setNumCharacters(e.target.value);
+                setFirstNumCharacters(e.target.value);
                 setProblems([]);
               }}
               min="1"
@@ -365,7 +341,44 @@ const MathOperation = ({ operationType }) => {
             />
           </Form.Group>
         </Col>
-        <Col md={6}>
+        <Col md={4}>
+          <Form.Group
+            controlId="secondNumCharacters"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              padding: "20px",
+              borderRadius: "8px",
+            }}
+          >
+            <Form.Label
+              className="h5 text-white"
+              style={{
+                fontWeight: "bold",
+                textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              Second Number Length
+            </Form.Label>
+            <Form.Control
+              type="number"
+              value={secondNumCharacters}
+              onChange={(e) => {
+                setSecondNumCharacters(e.target.value);
+                setProblems([]);
+              }}
+              min="1"
+              max="10"
+              className="shadow-sm"
+              style={{
+                borderColor: "#ffffff",
+                color: "#000",
+                backgroundColor: "#fff",
+                borderRadius: "5px",
+              }}
+            />
+          </Form.Group>
+        </Col>
+        <Col md={4}>
           <Form.Group
             controlId="numProblems"
             style={{
@@ -403,76 +416,7 @@ const MathOperation = ({ operationType }) => {
           </Form.Group>
         </Col>
       </Row>
-      {/* {operationType === "multiplication" && (
-        <Row className="my-4">
-          <Col md={6}>
-            <Form.Group controlId="multiplierRange">
-              <Form.Label>Multiplier Range</Form.Label>
-              <Row>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    placeholder="Min"
-                    value={multiplierRange.min}
-                    onChange={(e) =>
-                      setMultiplierRange({
-                        ...multiplierRange,
-                        min: e.target.value,
-                      })
-                    }
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    placeholder="Max"
-                    value={multiplierRange.max}
-                    onChange={(e) =>
-                      setMultiplierRange({
-                        ...multiplierRange,
-                        max: e.target.value,
-                      })
-                    }
-                  />
-                </Col>
-              </Row>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group controlId="multiplicantRange">
-              <Form.Label>Multiplicant Range</Form.Label>
-              <Row>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    placeholder="Min"
-                    value={multiplicantRange.min}
-                    onChange={(e) =>
-                      setMultiplicantRange({
-                        ...multiplicantRange,
-                        min: e.target.value,
-                      })
-                    }
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    placeholder="Max"
-                    value={multiplicantRange.max}
-                    onChange={(e) =>
-                      setMultiplicantRange({
-                        ...multiplicantRange,
-                        max: e.target.value,
-                      })
-                    }
-                  />
-                </Col>
-              </Row>
-            </Form.Group>
-          </Col>
-        </Row>
-      )} */}
+
       <Row className="my-4 justify-content-center">
         <Col md="auto">
           <Button
@@ -490,7 +434,7 @@ const MathOperation = ({ operationType }) => {
           <Button
             variant="secondary"
             onClick={handlePrint}
-            className="shadow-lg"
+            className="me-3 shadow-lg"
             style={{
               padding: "10px 20px",
               fontSize: "16px",
@@ -499,6 +443,34 @@ const MathOperation = ({ operationType }) => {
           >
             Print Problems
           </Button>
+          {problems.length > 0 && (
+            <>
+              <Button
+                variant={showAnswers ? "warning" : "success"}
+                onClick={() => setShowAnswers(!showAnswers)}
+                className="me-3 shadow-lg"
+                style={{
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  borderRadius: "8px",
+                }}
+              >
+                {showAnswers ? "Hide Answers" : "Show Answers"}
+              </Button>
+              <Button
+                variant="info"
+                onClick={downloadAnswers}
+                className="shadow-lg"
+                style={{
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  borderRadius: "8px",
+                }}
+              >
+                Download Answers
+              </Button>
+            </>
+          )}
         </Col>
       </Row>
 
