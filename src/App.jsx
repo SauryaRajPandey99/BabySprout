@@ -8,6 +8,7 @@ import Navbared from "./Components/Navbar/Navbar";
 import Addition from "./Components/Maths/Problems/Addition";
 import Substraction from "./Components/Maths/Problems/Substraction";
 import Multiplication from "./Components/Maths/Problems/Multiplication";
+import CombinedMathOperations from "./Components/Maths/Combinations/CombinedMathOperations";
 
 const App = () => {
   let heroData = [
@@ -59,6 +60,7 @@ const App = () => {
         <Route path="/addition" element={<Addition />} />
         <Route path="/substraction" element={<Substraction />} />
         <Route path="/multiplication" element={<Multiplication />} />
+        <Route path="/combinedproblems" element={<CombinedMathOperations />} />
       </Routes>
     </BrowserRouter>
   );

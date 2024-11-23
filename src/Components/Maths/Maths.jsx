@@ -12,6 +12,18 @@ function Maths() {
       <Card>
         <Card.Img variant="top" src={plus} />
         <Card.Body>
+          <Card.Title>Combination</Card.Title>
+          <Card.Text>
+           coombination of different problems 
+          </Card.Text>
+          <Link to="/combinedproblems">
+            <Button variant="primary">Combined Problems</Button>
+          </Link>
+        </Card.Body>
+      </Card>
+      <Card>
+        <Card.Img variant="top" src={plus} />
+        <Card.Body>
           <Card.Title>Addition</Card.Title>
           <Card.Text>
             Addition is combining two or more numbers together to get a new
