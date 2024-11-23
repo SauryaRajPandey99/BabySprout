@@ -9,6 +9,8 @@ import {
   Alert,
 } from "react-bootstrap";
 
+import logo from "../../../../Assets/BabySprout.png";
+
 const MathOperation = ({ operationType }) => {
   const [firstNumCharacters, setFirstNumCharacters] = useState("");
   const [secondNumCharacters, setSecondNumCharacters] = useState("");
@@ -253,11 +255,7 @@ const MathOperation = ({ operationType }) => {
     return (
       <div id="printSection">
         <div className="print-header">
-          <img
-            src="/src/Assets/BabySprout.png"
-            alt="Company Logo"
-            className="print-logo"
-          />
+          <img src={logo} alt="Company Logo" className="print-logo" />
           <div className="text-center">
             <h2 className="print-title">{title}</h2>
             <div className="print-date">Date: {currentDate}</div>

@@ -8,6 +8,7 @@ import {
   Card,
   Alert,
 } from "react-bootstrap";
+import logo from "../../../Assets/BabySprout.png";
 
 const CombinedMathOperation = () => {
   const [firstNumCharacters, setFirstNumCharacters] = useState("");
@@ -266,11 +267,7 @@ const CombinedMathOperation = () => {
     return (
       <div id="printSection">
         <div className="print-header">
-          <img
-            src="/src/Assets/BabySprout.png"
-            alt="Company Logo"
-            className="print-logo"
-          />
+          <img src={logo} alt="Company Logo" className="print-logo" />
           <div className="text-center">
             <h2 className="print-title">Mixed Math Problems</h2>
             <div className="print-date">Date: {currentDate}</div>

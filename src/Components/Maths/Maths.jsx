@@ -1,6 +1,7 @@
 import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
 import plus from "../../Assets/Plus.png";
+import combined from "../../Assets/CombinedMathProblems.png";
 import multiply from "../../Assets/multiply.png";
 import minus from "../../Assets/minus.png";
 import { Button } from "react-bootstrap";
@@ -9,18 +10,6 @@ import { Link } from "react-router-dom";
 function Maths() {
   return (
     <CardGroup>
-      <Card>
-        <Card.Img variant="top" src={plus} />
-        <Card.Body>
-          <Card.Title>Combination</Card.Title>
-          <Card.Text>
-           coombination of different problems 
-          </Card.Text>
-          <Link to="/combinedproblems">
-            <Button variant="primary">Combined Problems</Button>
-          </Link>
-        </Card.Body>
-      </Card>
       <Card>
         <Card.Img variant="top" src={plus} />
         <Card.Body>
@@ -62,6 +51,20 @@ function Maths() {
           </Card.Text>
           <Link to="/Multiplication">
             <Button variant="primary">Multiplication Problems</Button>
+          </Link>
+        </Card.Body>
+      </Card>
+      <Card>
+        <Card.Img variant="top" src={combined} />
+        <Card.Body>
+          <Card.Title>Combination</Card.Title>
+          <Card.Text>
+            This section covers the combined math problems of Addition ,
+            Substraction , Multiplication. Are you ready to be a perfect
+            mathmatician.
+          </Card.Text>
+          <Link to="/combinedproblems">
+            <Button variant="primary">Combined Problems</Button>
           </Link>
         </Card.Body>
       </Card>
