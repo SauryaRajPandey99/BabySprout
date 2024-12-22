@@ -7,6 +7,7 @@ import {
   Col,
   Card,
   Alert,
+  Badge,
 } from "react-bootstrap";
 import logo from "../../../Assets/BabySprout.png";
 
@@ -37,6 +38,10 @@ const CombinedMathOperation = () => {
       symbol: "-",
       calculate: (num1, num2) => num1 - num2,
     },
+  };
+
+  const getProblemCount = (operation) => {
+    return problems.filter((problem) => problem.operation === operation).length;
   };
 
   const handleOperationCountChange = (operation, value) => {
@@ -78,7 +83,6 @@ const CombinedMathOperation = () => {
 
     const generatedProblems = [];
 
-    // Generate problems for each operation based on their counts
     Object.entries(operationCounts).forEach(([operation, count]) => {
       const problemCount = parseInt(count) || 0;
       for (let i = 0; i < problemCount; i++) {
@@ -89,7 +93,6 @@ const CombinedMathOperation = () => {
           Math.floor(Math.random() * (maxSecondNumber - minSecondNumber + 1)) +
           minSecondNumber;
 
-        // For subtraction, ensure first number is larger
         if (operation === "subtraction" && num1 < num2) {
           [num1, num2] = [num2, num1];
         }
@@ -100,7 +103,6 @@ const CombinedMathOperation = () => {
       }
     });
 
-    // Shuffle the problems to mix different operations
     for (let i = generatedProblems.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [generatedProblems[i], generatedProblems[j]] = [
@@ -112,7 +114,6 @@ const CombinedMathOperation = () => {
     setProblems(generatedProblems);
   };
 
-  // Rest of the existing code remains the same...
   const formatNumber = (num, width) => {
     return String(num).padStart(width, " ");
   };
@@ -176,7 +177,6 @@ const CombinedMathOperation = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Keep all the existing print-related functions...
   const handlePrint = () => {
     const printContent = printRef.current;
     const originalDisplay = printContent.style.display;
@@ -435,13 +435,18 @@ const CombinedMathOperation = () => {
             }}
           >
             <Form.Label
-              className="h5 text-white"
+              className="h5 text-white d-flex justify-content-between align-items-center"
               style={{
                 fontWeight: "bold",
                 textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
               }}
             >
-              Number of Addition Problems
+              <span>Number of Addition Problems</span>
+              {problems.length > 0 && (
+                <Badge bg="info" pill>
+                  {getProblemCount("addition")}
+                </Badge>
+              )}
             </Form.Label>
             <Form.Control
               type="number"
@@ -472,13 +477,18 @@ const CombinedMathOperation = () => {
             }}
           >
             <Form.Label
-              className="h5 text-white"
+              className="h5 text-white d-flex justify-content-between align-items-center"
               style={{
                 fontWeight: "bold",
-                textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
+                textShadow: "1px 1px 3px rgba(0, 0, 0,0.5)",
               }}
             >
-              Number of Subtraction Problems
+              <span>Number of Subtraction Problems</span>
+              {problems.length > 0 && (
+                <Badge bg="info" pill>
+                  {getProblemCount("subtraction")}
+                </Badge>
+              )}
             </Form.Label>
             <Form.Control
               type="number"
@@ -509,13 +519,18 @@ const CombinedMathOperation = () => {
             }}
           >
             <Form.Label
-              className="h5 text-white"
+              className="h5 text-white d-flex justify-content-between align-items-center"
               style={{
                 fontWeight: "bold",
                 textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
               }}
             >
-              Number of Multiplication Problems
+              <span>Number of Multiplication Problems</span>
+              {problems.length > 0 && (
+                <Badge bg="info" pill>
+                  {getProblemCount("multiplication")}
+                </Badge>
+              )}
             </Form.Label>
             <Form.Control
               type="number"
